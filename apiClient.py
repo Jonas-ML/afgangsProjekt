@@ -11,4 +11,6 @@ class restClient:
     def post(self, path):
         self.base_url + "/" + path
 
-  
+  ## we have init for authentication and holding the base url as variable
+  # we will make functions to send requests
+  # these should take body and header parameters from main.py
