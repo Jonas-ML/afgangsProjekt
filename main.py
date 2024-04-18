@@ -15,6 +15,6 @@ r = requests.get("https://api.github.com/repos/Jonas-ML/afgangsProjekt/commits?s
 if r.status_code == 200:
     response_json = r.json()
     json_response = json.dumps(response_json, indent=2)
-    print(json_response)
+    print(json_response["message"])
 else:
     print("Error", r.status_code)
