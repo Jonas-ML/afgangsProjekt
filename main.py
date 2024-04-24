@@ -8,7 +8,6 @@ response, status_code = a.get("repos/Jonas-ML/afgangsProjekt/commits", params={"
 
 if status_code == 200:
     res = a.formatResponse(response)
-    print(res)
 else:
     print("ERROR CODE:", status_code)
     

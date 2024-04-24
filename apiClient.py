@@ -23,8 +23,8 @@ class restClient: # init of object with baseURL and token
             print("Error making GET request" + ":", error)
             return None, None
 
-    def post(self, path):
-        self.base_url + "/" + path
+    def post(self, path, params=None, headers=None):
+        pass
     
     def formatResponse(self, response):
         res = response.json()
