@@ -5,8 +5,8 @@ import json
 
 
 
-headers = {
-    'Authorization': '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',
+""" headers = {
+    'Authorization': token,
     'Accept' : '*/*',
 }
 ## "?sha=dev" is branch definition
@@ -15,6 +15,15 @@ r = requests.get("https://api.github.com/repos/Jonas-ML/afgangsProjekt/commits?s
 if r.status_code == 200:
     response_json = r.json()
     json_response = json.dumps(response_json, indent=2)
-    print(json_response["message"])
+    print(json_response)
 else:
-    print("Error", r.status_code)
+    print("Error", r.status_code) """
+    
+a = restClient()
+response, status_code = a.get("repos/Jonas-ML/afgangsProjekt/commits", params={"sha":"dev"})
+if status_code == 200:
+    res = a.formatResponse(response)
+    print(res)
+else:
+    print("ERROR CODE:", status_code)
+    
