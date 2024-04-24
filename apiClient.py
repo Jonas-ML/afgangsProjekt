@@ -8,11 +8,15 @@ class restClient: # init of object with baseURL and token
     def __init__(self):
         self.token = token
         self.base_url = 'https://api.github.com'
+        self.default_header = {"Authorization" : token}
 
     def get(self, path, params=None, headers=None):
         url = self.base_url + "/" + path
+        final_headers = self.default_header
+        if headers:
+            final_headers.update(headers)
         try:
-            response = requests.get(url, headers=headers, params=params)
+            response = requests.get(url, headers=final_headers, params=params)
             status_code = response.status_code
             return response, status_code
         except requests.RequestException as error:
