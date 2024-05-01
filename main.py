@@ -4,6 +4,7 @@ import json
 from customtkinter import *
 import customtkinter as ctk
 from dataFormatter import *
+
 a = restClient()
 app = CTk()
 app.geometry("900x900")
