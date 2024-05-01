@@ -42,7 +42,7 @@ def comboChoice(choice):
         choiceQuery = a.formatResponse(response)
         print(choiceQuery)
     else:
-        print(f"Cant fetch the specified repo: {status_cde}")
+        print(f"Cant fetch the specified repo: {status_code}")
 
     
 
