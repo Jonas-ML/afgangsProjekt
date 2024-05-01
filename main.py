@@ -35,7 +35,14 @@ def fetchRepos(repoRes): # Indexes the json object to extract repo names
     repo_options = [repo['name'] for repo in data]
     return repo_options
 
-
+def comboChoice(choice):
+    name = user_entry.get()
+    response, status_code = a.get(f"repos/{name}/{choice}/commits")
+    if status_code == 200:
+        choiceQuery = a.formatResponse(response)
+        print(choiceQuery)
+    else:
+        print(f"Cant fetch the specified repo: {status_cde}")
 
     
 
