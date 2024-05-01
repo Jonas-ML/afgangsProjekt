@@ -1,4 +1,4 @@
-from main import *
+from apiClient import *
 
 a = restClient()
 
@@ -12,7 +12,7 @@ else:
 
 
 data = json.loads(res)
-search = "message"
+
 
 for commit in data:
     commit_message = commit['commit']['message']
