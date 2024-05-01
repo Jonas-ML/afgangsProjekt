@@ -13,8 +13,8 @@ else:
 
 data = json.loads(res)
 
-
-for commit in data:
-    commit_message = commit['commit']['message']
-    commit_date = commit['commit']['committer']['date']
-    print(commit_message, commit_date)
+def searchByCommits(response):
+    for commit in data:
+        commit_message = commit['commit']['message']
+        commit_date = commit['commit']['committer']['date']
+        print(commit_message, commit_date)
