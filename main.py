@@ -28,8 +28,8 @@ def getUserName():
         repoRes = formatResponse(response)
         repo_options = fetchRepos(repoRes)
         if repo_options:
-            repo_combo = ctk.CTkComboBox(search_tab, values=repo_options, command=comboChoice)
-            repo_combo.pack(pady=40)
+            repo_combo = ctk.CTkComboBox(user_tab, values=repo_options, command=comboChoice)
+            repo_combo.pack(pady=10) 
         else:
             print("No repos found for this user. Did you supply the correct username?")
     else:
@@ -56,8 +56,23 @@ user_entry.pack(pady=40)
 user_button = ctk.CTkButton(user_tab, text="Submit", command=getUserName)
 user_button.pack(pady=40)
 
-#Put stuff in Search Tab
 
+#TEXT WIDGET
+txtFrame = ctk.CTkFrame(search_tab)
+txtFrame.pack(pady=30)
+
+txtWidget = ctk.CTkTextbox(search_tab,
+    width=200,
+    height=200)
+txtWidget.pack(pady=30)
+
+delete_button = ctk.CTkButton(txtFrame, text="Delete")
+paste_button = ctk.CTkButton(txtFrame, text="Paste")
+save_button = ctk.CTkButton(txtFrame, text="Save as")
+
+delete_button.grid(row=5, column=0, pady=20)
+paste_button.grid(row=5, column=1, pady=20)
+save_button.grid(row=5, column=2, pady=20)
 
 app.mainloop()
 
