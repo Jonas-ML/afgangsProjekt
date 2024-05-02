@@ -2,18 +2,21 @@ from apiClient import *
 
 a = restClient()
 
-response, status_code = a.get("repos/Jonas-ML/afgangsProjekt/commits", params={"sha":"dev"})
-
-if status_code == 200:
-    res = a.formatResponse(response)
-else:
-    print("ERROR CODE:", status_code)
-    
 
 
-data = json.loads(res)
 
-def searchByCommits(response):
+
+
+
+
+def formatResponse(response): # Formats json string, to json object structure
+    res = response.json()
+    json_str = json.dumps(res, indent=2)
+    return json_str
+
+
+def formatCommits(response): # 
+    data = json.loads(response)
     for commit in data:
         commit_message = commit['commit']['message']
         commit_date = commit['commit']['committer']['date']

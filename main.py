@@ -21,7 +21,7 @@ def getUserName():
     name = user_entry.get()
     response, status_code = a.get(f"users/{name}/repos")
     if status_code == 200:
-        repoRes = a.formatResponse(response)
+        repoRes = formatResponse(response)
         repo_options = fetchRepos(repoRes)
         if repo_options:
             repo_combo = ctk.CTkComboBox(search_tab, values=repo_options, command=comboChoice)
@@ -40,15 +40,15 @@ def comboChoice(choice): # Event handler for dropdown box
     name = user_entry.get()
     response, status_code = a.get(f"repos/{name}/{choice}/commits")
     if status_code == 200:
-        choiceQuery = a.formatResponse(response)
-        formattedRes = searchByCommits(choiceQuery)
+        choiceSelection = formatResponse(response)
+        formattedRes = formatCommits(choiceSelection)
         print(formattedRes)
     else:
         print(f"Cant fetch the specified repo: {status_code}")
 
     
 
-    
+
 #Put stuff in tab 1 - User tab
 user_entry = ctk.CTkEntry(user_tab, placeholder_text="Github username:")
 user_entry.pack(pady=40)

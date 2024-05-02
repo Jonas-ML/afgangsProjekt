@@ -26,14 +26,6 @@ class restClient: # init of object with baseURL and token
     def post(self, path, params=None, headers=None):
         pass
 
-# Maybe move this to data formatter     
-    def formatResponse(self, response):
-        res = response.json()
-        json_str = json.dumps(res, indent=2)
-        return json_str
-#
-
-
 
   ## we have init for authentication and holding the base url as variable
   # we will make functions to send requests
