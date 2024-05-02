@@ -1,9 +1,13 @@
-import requests
+
 from apiClient import *
-import json
 from customtkinter import *
 import customtkinter as ctk
 from dataFormatter import *
+
+from methods.fetchRepos import fetchRepos
+
+
+
 
 a = restClient()
 app = CTk()
@@ -31,10 +35,6 @@ def getUserName():
     else:
         print(f"Error fetching data: {status_code}")
 
-def fetchRepos(repoRes): # Indexes the json object to extract repo names
-    data = json.loads(repoRes)
-    repo_options = [repo['name'] for repo in data]
-    return repo_options
 
 def comboChoice(choice): # Event handler for dropdown box
     name = user_entry.get()

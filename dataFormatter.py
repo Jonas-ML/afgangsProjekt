@@ -1,13 +1,5 @@
 from apiClient import *
 
-a = restClient()
-
-
-
-
-
-
-
 
 def formatResponse(response): # Formats json string, to json object structure
     res = response.json()
