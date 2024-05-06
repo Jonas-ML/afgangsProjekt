@@ -2,16 +2,15 @@
 from apiClient import *
 from customtkinter import *
 import customtkinter as ctk
-from dataFormatter import *
+from formatMethods import *
 
-from methods.fetchRepos import fetchRepos
 
 
 
 
 a = restClient()
 app = CTk()
-app.geometry("900x900")
+app.geometry("1200x800")
 
 
 # Tab defintions
@@ -29,7 +28,7 @@ def getUserName():
         repo_options = fetchRepos(repoRes)
         if repo_options:
             repo_combo = ctk.CTkComboBox(user_tab, values=repo_options, command=comboChoice)
-            repo_combo.pack(pady=10) 
+            repo_combo.pack(pady=1) 
         else:
             print("No repos found for this user. Did you supply the correct username?")
     else:
@@ -41,12 +40,18 @@ def comboChoice(choice): # Event handler for dropdown box
     response, status_code = a.get(f"repos/{name}/{choice}/commits")
     if status_code == 200:
         choiceSelection = formatResponse(response)
-        formattedRes = formatCommits(choiceSelection)
-        print(formattedRes)
+        commit_details = formatCommits(choiceSelection)
+        print(commit_details)
+        my_text.insert(END, commit_details)
     else:
         print(f"Cant fetch the specified repo: {status_code}")
 
-    
+
+# Funtions for textwidget
+def delete():
+    my_text.delete(0.0, "end")
+
+
 
 
 #Put stuff in tab 1 - User tab
@@ -56,23 +61,19 @@ user_entry.pack(pady=40)
 user_button = ctk.CTkButton(user_tab, text="Submit", command=getUserName)
 user_button.pack(pady=40)
 
+my_text= ctk.CTkTextbox(search_tab)
+my_text.pack(pady =110)
 
-#TEXT WIDGET
-txtFrame = ctk.CTkFrame(search_tab)
-txtFrame.pack(pady=30)
+txt_frame = ctk.CTkFrame(search_tab)
+txt_frame.pack(pady=130)
 
-txtWidget = ctk.CTkTextbox(search_tab,
-    width=200,
-    height=200)
-txtWidget.pack(pady=30)
+#Buttons
+delete_button = ctk.CTkButton(txt_frame, text="Delete", command=delete)
+paste_button = ctk.CTkButton(txt_frame, text="Pase")
+save_button = ctk.CTkButton(txt_frame, text="Save")
 
-delete_button = ctk.CTkButton(txtFrame, text="Delete")
-paste_button = ctk.CTkButton(txtFrame, text="Paste")
-save_button = ctk.CTkButton(txtFrame, text="Save as")
-
-delete_button.grid(row=5, column=0, pady=20)
-paste_button.grid(row=5, column=1, pady=20)
-save_button.grid(row=5, column=2, pady=20)
-
+delete_button.grid(row=2, column=0)
+paste_button.grid(row=2, column=1, padx=5)
+save_button.grid(row=2, column=2)
 app.mainloop()
 
