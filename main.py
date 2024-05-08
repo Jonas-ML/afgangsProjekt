@@ -20,31 +20,43 @@ user_tab = tabview.add("tab 1")
 search_tab = tabview.add("tab 2")
 tabview._segmented_button.grid(sticky="NSEW") #Sørger for tabs er i en relativ præsentabel postion
 
-def getUserName():
+def repoChoice():
     name = user_entry.get()
     response, status_code = a.get(f"users/{name}/repos")
     if status_code == 200:
         repoRes = formatResponse(response)
         repo_options = fetchRepos(repoRes)
         if repo_options:
-            repo_combo = ctk.CTkComboBox(user_tab, values=repo_options, command=comboChoice)
-            repo_combo.pack(pady=1) 
+            repo_combo = ctk.CTkComboBox(user_tab, values=repo_options, command=lambda event=None: branchChoice(name, repo_combo.get())) # lambda for at kunne definere flere argumenter til callback
+            repo_combo.pack(pady=1)
         else:
             print("No repos found for this user. Did you supply the correct username?")
     else:
         print(f"Error fetching data: {status_code}")
+    
 
-
-def comboChoice(choice): # Event handler for dropdown box
-    name = user_entry.get()
-    response, status_code = a.get(f"repos/{name}/{choice}/commits")
+def branchChoice(name, choosen_repo):
+    response, status_code = a.get(f"repos/{name}/{choosen_repo}/branches")
     if status_code == 200:
-        choiceSelection = formatResponse(response)
-        commit_details = formatCommits(choiceSelection)
-        print(commit_details)
-        my_text.insert(END, commit_details)
+        branchRes = formatResponse(response)
+        branch_options = fetchRepos(branchRes)
+        if branch_options:
+            branch_combo = ctk.CTkComboBox(user_tab, values=branch_options, command=lambda event=None: getCommits(name, choosen_repo, branch_combo.get()))
+            branch_combo.pack(pady=5)
+        else:
+            print("Couldnt fetch branches for this repo")
     else:
-        print(f"Cant fetch the specified repo: {status_code}")
+        print(f"Error fetching data {status_code}")
+    
+def getCommits(name, choosen_repo, choosen_Branch):
+    response, status_code = a.get(f"repos/{name}/{choosen_repo}/commits", params={"sha" : choosen_Branch})
+    if status_code == 200:
+        commits_raw = formatResponse(response)
+        commits_pretty = formatCommits(commits_raw)
+        my_text.insert(END, commits_pretty)
+
+
+ 
 
 
 # Funtions for textwidget
@@ -58,22 +70,26 @@ def delete():
 user_entry = ctk.CTkEntry(user_tab, placeholder_text="Github username:")
 user_entry.pack(pady=40)
 
-user_button = ctk.CTkButton(user_tab, text="Submit", command=getUserName)
+user_button = ctk.CTkButton(user_tab, text="Submit", command=repoChoice)
 user_button.pack(pady=40)
 
-my_text= ctk.CTkTextbox(search_tab)
-my_text.pack(pady =110)
+my_text= ctk.CTkTextbox(search_tab,
+    width=600,
+    height=400,
+    corner_radius=1,)
+
+my_text.pack(pady =10)
 
 txt_frame = ctk.CTkFrame(search_tab)
 txt_frame.pack(pady=130)
 
 #Buttons
 delete_button = ctk.CTkButton(txt_frame, text="Delete", command=delete)
-paste_button = ctk.CTkButton(txt_frame, text="Pase")
+#paste_button = ctk.CTkButton(txt_frame, text="Paste")
 save_button = ctk.CTkButton(txt_frame, text="Save")
 
-delete_button.grid(row=2, column=0)
-paste_button.grid(row=2, column=1, padx=5)
+delete_button.grid(row=2, column=0, padx=2)
+#paste_button.grid(row=2, column=1, padx=5)
 save_button.grid(row=2, column=2)
 app.mainloop()
 
