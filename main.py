@@ -20,6 +20,10 @@ user_tab = tabview.add("tab 1")
 search_tab = tabview.add("tab 2")
 tabview._segmented_button.grid(sticky="NSEW") #Sørger for tabs er i en relativ præsentabel postion
 
+
+
+dropdowns = {}
+
 def repoChoice():
     name = user_entry.get()
     response, status_code = a.get(f"users/{name}/repos")
@@ -27,8 +31,12 @@ def repoChoice():
         repoRes = formatResponse(response)
         repo_options = fetchRepos(repoRes)
         if repo_options:
-            repo_combo = ctk.CTkComboBox(user_tab, values=repo_options, command=lambda event=None: branchChoice(name, repo_combo.get())) # lambda for at kunne definere flere argumenter til callback
-            repo_combo.pack(pady=1)
+            if name not in dropdowns:
+                dropdowns[name] = {}
+            if 'repo_combo' not in dropdowns[name]:
+                repo_combo = ctk.CTkComboBox(user_tab, values=repo_options, command=lambda event=None: branchChoice(name, repo_combo.get()))
+                repo_combo.pack(pady=1)
+                dropdowns[name]['repo_combo'] = repo_combo
         else:
             print("No repos found for this user. Did you supply the correct username?")
     else:
@@ -41,8 +49,10 @@ def branchChoice(name, choosen_repo):
         branchRes = formatResponse(response)
         branch_options = fetchRepos(branchRes)
         if branch_options:
-            branch_combo = ctk.CTkComboBox(user_tab, values=branch_options, command=lambda event=None: getCommits(name, choosen_repo, branch_combo.get()))
-            branch_combo.pack(pady=5)
+            if 'branch_combo' not in dropdowns[name]:
+                branch_combo = ctk.CTkComboBox(user_tab, values=branch_options, command=lambda event=None: getCommits(name, choosen_repo, branch_combo.get()))
+                branch_combo.pack(pady=5)
+                dropdowns[name]['branch_combo'] = branch_combo
         else:
             print("Couldnt fetch branches for this repo")
     else:
