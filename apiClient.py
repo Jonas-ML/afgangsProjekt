@@ -8,7 +8,7 @@ class restClient: # init of object with baseURL and token
     def __init__(self):
         self.token = token
         self.base_url = 'https://api.github.com'
-        self.default_header = {"Authorization" : token}
+        self.default_header = {"Authorization" :f"token {token}"}
 
     def get(self, path, params=None, headers=None):
         url = self.base_url + "/" + path

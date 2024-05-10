@@ -64,6 +64,11 @@ def getCommits(name, choosen_repo, choosen_Branch):
         commits_raw = formatResponse(response)
         commits_pretty = formatCommits(commits_raw)
         my_text.insert(END, commits_pretty)
+        clearDropdowns(name)
+        tabview.set("tab 2")
+    
+    else:
+        print(f"Error fetching data {status_code}")
 
 
  
@@ -73,8 +78,24 @@ def getCommits(name, choosen_repo, choosen_Branch):
 def delete():
     my_text.delete(0.0, "end")
 
-
-
+def save():
+    dialog = ctk.CTkInputDialog(text="What would you like your file to be named", title="Save file")
+    fileName = dialog.get_input()
+    txt = my_text.get(0.0, END)
+    if fileName:
+        txtFile = open(f"{fileName}.txt", "w")
+        txtFile.write(f"{txt}")
+        txtFile.close()
+        
+        
+def clearDropdowns(name):
+    if name in dropdowns and 'repo_combo' in dropdowns[name]:
+        dropdowns[name]['repo_combo'].destroy()
+        del dropdowns[name]['repo_combo']
+    if name in dropdowns and 'branch_combo' in dropdowns[name]:
+        dropdowns[name]['branch_combo'].destroy()
+        del dropdowns[name]['branch_combo']
+    
 
 #Put stuff in tab 1 - User tab
 user_entry = ctk.CTkEntry(user_tab, placeholder_text="Github username:")
@@ -96,7 +117,7 @@ txt_frame.pack(pady=130)
 #Buttons
 delete_button = ctk.CTkButton(txt_frame, text="Delete", command=delete)
 #paste_button = ctk.CTkButton(txt_frame, text="Paste")
-save_button = ctk.CTkButton(txt_frame, text="Save")
+save_button = ctk.CTkButton(txt_frame, text="Save", command=save)
 
 delete_button.grid(row=2, column=0, padx=2)
 #paste_button.grid(row=2, column=1, padx=5)
