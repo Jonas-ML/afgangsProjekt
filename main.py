@@ -12,124 +12,139 @@ class gitApp:
         self.a = restClient()
         self.app = ctk.CTk()
         self.app.geometry("1200x800")
-        self.create_widgets()
+        self.createWidgets()
         self.dropdowns = {}
         
     def createWidgets(self):
         self.createTabs()
+        self.createLabels()
+        self.createEntryBoxes()
+        self.createButtons()
+        self.createTxtWidget()
 
 
     def createTabs(self):
-        tabview = ctk.CTkTabview(master=app, width=900, height=900)
-        tabview.pack()
-        user_tab = tabview.add("tab 1")
-        search_tab = tabview.add("tab 2")
-        tabview._segmented_button.grid(sticky="NSEW") #Sørger for tabs er i en relativ præsentabel postion
+        self.tabview = ctk.CTkTabview(master=self.app, width=900, height=900)
+        self.tabview.pack()
+        self.user_tab = self.tabview.add("tab 1")
+        self.search_tab = self.tabview.add("tab 2")
+        self.tabview._segmented_button.grid(sticky="NSEW") #Sørger for tabs er i en relativ præsentabel postion
 
-
-
-
-
-
-
-
-def repoChoice():
-    name = user_entry.get()
-    response, status_code = a.get(f"users/{name}/repos")
-    if status_code == 200:
-        repoRes = formatResponse(response)
-        repo_options = fetchRepos(repoRes)
-        if repo_options:
-            if name not in dropdowns:
-                dropdowns[name] = {}
-            if 'repo_combo' not in dropdowns[name]:
-                repo_combo = ctk.CTkComboBox(user_tab, values=repo_options, command=lambda event=None: branchChoice(name, repo_combo.get()))
-                repo_combo.pack(pady=1)
-                dropdowns[name]['repo_combo'] = repo_combo
-        else:
-            print("No repos found for this user. Did you supply the correct username?")
-    else:
-        print(f"Error fetching data: {status_code}")
+    def createLabels(self):
+        pass
     
+    def createEntryBoxes(self):
+        self.user_entry = ctk.CTkEntry(self.user_tab, placeholder_text="Github username:")
+        self.user_entry.pack(pady=40)
 
-def branchChoice(name, choosen_repo):
-    response, status_code = a.get(f"repos/{name}/{choosen_repo}/branches")
-    if status_code == 200:
-        branchRes = formatResponse(response)
-        branch_options = fetchRepos(branchRes)
-        if branch_options:
-            if 'branch_combo' not in dropdowns[name]:
-                branch_combo = ctk.CTkComboBox(user_tab, values=branch_options, command=lambda event=None: getCommits(name, choosen_repo, branch_combo.get()))
-                branch_combo.pack(pady=5)
-                dropdowns[name]['branch_combo'] = branch_combo
-        else:
-            print("Couldnt fetch branches for this repo")
-    else:
-        print(f"Error fetching data {status_code}")
-    
-def getCommits(name, choosen_repo, choosen_Branch):
-    response, status_code = a.get(f"repos/{name}/{choosen_repo}/commits", params={"sha" : choosen_Branch})
-    if status_code == 200:
-        commits_raw = formatResponse(response)
-        commits_pretty = formatCommits(commits_raw)
-        my_text.insert(END, commits_pretty)
-        clearDropdowns(name)
-        tabview.set("tab 2")
-    
-    else:
-        print(f"Error fetching data {status_code}")
-
-
- 
-
-
-# Funtions for textwidget
-def delete():
-    my_text.delete(0.0, "end")
-
-def save():
-    dialog = ctk.CTkInputDialog(text="What would you like your file to be named", title="Save file")
-    fileName = dialog.get_input()
-    txt = my_text.get(0.0, END)
-    if fileName:
-        txtFile = open(f"{fileName}.txt", "w")
-        txtFile.write(f"{txt}")
-        txtFile.close()
+    def createButtons(self):
+        self.user_button = ctk.CTkButton(self.user_tab, text="Submit", command=self.repoChoice)
+        self.user_button.pack(pady=40)
         
+    def createTxtWidget(self):
+        self.my_text= ctk.CTkTextbox(self.search_tab,
+        width=600,
+        height=400,
+        corner_radius=1,)
+
+        self.my_text.pack(pady =10)
+
+        self.txt_frame = ctk.CTkFrame(self.search_tab)
+        self.txt_frame.pack(pady=130)
         
-def clearDropdowns(name):
-    if name in dropdowns and 'repo_combo' in dropdowns[name]:
-        dropdowns[name]['repo_combo'].destroy()
-        del dropdowns[name]['repo_combo']
-    if name in dropdowns and 'branch_combo' in dropdowns[name]:
-        dropdowns[name]['branch_combo'].destroy()
-        del dropdowns[name]['branch_combo']
+        self.delete_button = ctk.CTkButton(self.txt_frame, text="Delete", command=self.delete)
+        self.save_button = ctk.CTkButton(self.txt_frame, text="Save", command=self.save)
+        self.delete_button.grid(row=2, column=0, padx=2)
+        self.save_button.grid(row=2, column=2)
+        
+
+
+    def repoChoice(self):
+        name = self.user_entry.get()
+        response, status_code = self.a.get(f"users/{name}/repos")
+        if status_code == 200:
+            repoRes = formatResponse(response)
+            repo_options = fetchRepos(repoRes)
+            if repo_options:
+                if name not in self.dropdowns:
+                    self.dropdowns[name] = {}
+                if 'repo_combo' not in self.dropdowns[name]:
+                    repo_combo = ctk.CTkComboBox(self.user_tab, values=repo_options, command=lambda event=None: self.branchChoice(name, repo_combo.get()))
+                    repo_combo.pack(pady=1)
+                    self.dropdowns[name]['repo_combo'] = repo_combo
+            else:
+                print("No repos found for this user. Did you supply the correct username?")
+        else:
+            print(f"Error fetching data: {status_code}")
     
 
-#Put stuff in tab 1 - User tab
-user_entry = ctk.CTkEntry(user_tab, placeholder_text="Github username:")
-user_entry.pack(pady=40)
+    def branchChoice(self, name, choosen_repo):
+        response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/branches")
+        if status_code == 200:
+            branchRes = formatResponse(response)
+            branch_options = fetchRepos(branchRes)
+            if branch_options:
+                if 'branch_combo' not in self.dropdowns[name]:
+                    self.branch_combo = ctk.CTkComboBox(self.user_tab, values=branch_options, command=lambda event=None: self.getCommits(name, choosen_repo, self.branch_combo.get()))
+                    self.branch_combo.pack(pady=5)
+                    self.dropdowns[name]['branch_combo'] = self.branch_combo
+            else:
+                print("Couldnt fetch branches for this repo")
+        else:
+            print(f"Error fetching data {status_code}")
+    
+    def getCommits(self, name, choosen_repo, choosen_Branch):
+        response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/commits", params={"sha" : choosen_Branch})
+        if status_code == 200:
+            commits_raw = formatResponse(response)
+            commits_pretty = formatCommits(commits_raw)
+            self.my_text.insert(END, commits_pretty)
+            self.clearDropdowns(name)
+            self.tabview.set("tab 2")
+        
+        else:
+            print(f"Error fetching data {status_code}")
 
-user_button = ctk.CTkButton(user_tab, text="Submit", command=repoChoice)
-user_button.pack(pady=40)
 
-my_text= ctk.CTkTextbox(search_tab,
-    width=600,
-    height=400,
-    corner_radius=1,)
+    def delete(self):
+        self.my_text.delete(0.0, "end")
 
-my_text.pack(pady =10)
+    def save(self):
+        dialog = ctk.CTkInputDialog(text="What would you like your file to be named", title="Save file")
+        fileName = dialog.get_input()
+        txt = self.my_text.get(0.0, END)
+        if fileName:
+            txtFile = open(f"{fileName}.txt", "w")
+            txtFile.write(f"{txt}")
+            txtFile.close()
+            
+            
+    def clearDropdowns(self, name):
+        if name in self.dropdowns and 'repo_combo' in self.dropdowns[name]:
+            self.dropdowns[name]['repo_combo'].destroy()
+            del self.dropdowns[name]['repo_combo']
+        if name in self.dropdowns and 'branch_combo' in self.dropdowns[name]:
+            self.dropdowns[name]['branch_combo'].destroy()
+            del self.dropdowns[name]['branch_combo']
+    
 
-txt_frame = ctk.CTkFrame(search_tab)
-txt_frame.pack(pady=130)
 
-#Buttons
-delete_button = ctk.CTkButton(txt_frame, text="Delete", command=delete)
-#paste_button = ctk.CTkButton(txt_frame, text="Paste")
-save_button = ctk.CTkButton(txt_frame, text="Save", command=save)
 
-delete_button.grid(row=2, column=0, padx=2)
-#paste_button.grid(row=2, column=1, padx=5)
-save_button.grid(row=2, column=2)
-#app.mainloop()
+
+
+
+
+
+
+
+
+
+
+app = gitApp()
+app.app.mainloop()
+
+
+
+
+
 
