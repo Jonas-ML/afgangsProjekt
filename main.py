@@ -14,6 +14,7 @@ class gitApp:
         self.app.geometry("1200x800")
         self.createWidgets()
         self.dropdowns = {}
+        self.dataFormatter = dataFormatter()
         
     def createWidgets(self):
         self.createTabs()
@@ -63,8 +64,8 @@ class gitApp:
         name = self.user_entry.get()
         response, status_code = self.a.get(f"users/{name}/repos")
         if status_code == 200:
-            repoRes = formatResponse(response)
-            repo_options = fetchRepos(repoRes)
+            repoRes = dataFormatter.formatResponse(response)
+            repo_options = dataFormatter.fetchRepos(repoRes)
             if repo_options:
                 if name not in self.dropdowns:
                     self.dropdowns[name] = {}
@@ -81,8 +82,8 @@ class gitApp:
     def branchChoice(self, name, choosen_repo):
         response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/branches")
         if status_code == 200:
-            branchRes = formatResponse(response)
-            branch_options = fetchRepos(branchRes)
+            branchRes = dataFormatter.formatResponse(response)
+            branch_options = dataFormatter.fetchRepos(branchRes)
             if branch_options:
                 if 'branch_combo' not in self.dropdowns[name]:
                     self.branch_combo = ctk.CTkComboBox(self.user_tab, values=branch_options, command=lambda event=None: self.getCommits(name, choosen_repo, self.branch_combo.get()))
@@ -96,8 +97,8 @@ class gitApp:
     def getCommits(self, name, choosen_repo, choosen_Branch):
         response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/commits", params={"sha" : choosen_Branch})
         if status_code == 200:
-            commits_raw = formatResponse(response)
-            commits_pretty = formatCommits(commits_raw)
+            commits_raw = dataFormatter.formatResponse(response)
+            commits_pretty = dataFormatter.formatCommits(commits_raw)
             self.my_text.insert(END, commits_pretty)
             self.clearDropdowns(name)
             self.tabview.set("tab 2")
