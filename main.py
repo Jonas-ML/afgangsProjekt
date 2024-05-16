@@ -7,22 +7,31 @@ from formatMethods import *
 
 
 
-
-a = restClient()
-app = CTk()
-app.geometry("1200x800")
-
-
-# Tab defintions
-tabview = ctk.CTkTabview(master=app, width=900, height=900)
-tabview.pack()
-user_tab = tabview.add("tab 1")
-search_tab = tabview.add("tab 2")
-tabview._segmented_button.grid(sticky="NSEW") #Sørger for tabs er i en relativ præsentabel postion
+class gitApp:
+    def __init__(self):
+        self.a = restClient()
+        self.app = ctk.CTk()
+        self.app.geometry("1200x800")
+        self.create_widgets()
+        self.dropdowns = {}
+        
+    def createWidgets(self):
+        self.createTabs()
 
 
+    def createTabs(self):
+        tabview = ctk.CTkTabview(master=app, width=900, height=900)
+        tabview.pack()
+        user_tab = tabview.add("tab 1")
+        search_tab = tabview.add("tab 2")
+        tabview._segmented_button.grid(sticky="NSEW") #Sørger for tabs er i en relativ præsentabel postion
 
-dropdowns = {}
+
+
+
+
+
+
 
 def repoChoice():
     name = user_entry.get()
@@ -122,5 +131,5 @@ save_button = ctk.CTkButton(txt_frame, text="Save", command=save)
 delete_button.grid(row=2, column=0, padx=2)
 #paste_button.grid(row=2, column=1, padx=5)
 save_button.grid(row=2, column=2)
-app.mainloop()
+#app.mainloop()
 
