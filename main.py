@@ -98,7 +98,7 @@ class gitApp:
         response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/commits", params={"sha" : choosen_Branch})
         if status_code == 200:
             commits_raw = dataFormatter.formatResponse(response)
-            commits_pretty = dataFormatter.formatCommits(commits_raw)
+            commits_pretty = dataFormatter.formatCommits(commits_raw, choosen_repo, choosen_Branch)
             self.my_text.insert(END, commits_pretty)
             self.clearDropdowns(name)
             self.tabview.set("tab 2")

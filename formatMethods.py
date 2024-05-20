@@ -11,7 +11,7 @@ class dataFormatter:
         return json_str
 
 
-    def formatCommits(response): # 
+    def formatCommits(response, choosen_repo, choosen_Branch): # 
         data = json.loads(response)
         commit_details =""
         for commit in data:
@@ -19,6 +19,7 @@ class dataFormatter:
             commit_date = commit['commit']['committer']['date']
             commit_details+= (
                  "================================================================================\n"
+                f"Repository: {choosen_repo} on Branch: {choosen_Branch}\n"
                 f"Commit: {commit_message}\n"
                 f"Date:   {commit_date}\n"
                 "--------------------------------------------------------------------------------\n"
