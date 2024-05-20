@@ -5,6 +5,13 @@ class dataFormatter:
     def __init__(self):
         pass
         
+        
+    def fetchRepos(response): # Indexes the json object to extract repo names
+        data = json.loads(response)
+        repo_options = [repo['name'] for repo in data]
+        return repo_options    
+    
+    
     def formatResponse(response): # Formats json string, to json object structure
         res = response.json()
         json_str = json.dumps(res, indent=2)
@@ -22,12 +29,7 @@ class dataFormatter:
                 f"Repository: {choosen_repo} on Branch: {choosen_Branch}\n"
                 f"Commit: {commit_message}\n"
                 f"Date:   {commit_date}\n"
-                "--------------------------------------------------------------------------------\n"
             )
         return commit_details
 
 
-    def fetchRepos(response): # Indexes the json object to extract repo names
-        data = json.loads(response)
-        repo_options = [repo['name'] for repo in data]
-        return repo_options

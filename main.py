@@ -7,14 +7,15 @@ from formatMethods import *
 
 
 
-class gitApp:
+class gitApp(ctk.CTk):
     def __init__(self):
+        super().__init__()
         self.a = restClient()
-        self.app = ctk.CTk()
-        self.app.geometry("1200x800")
+        self.geometry("1200x800")
         self.createWidgets()
         self.dropdowns = {}
         self.dataFormatter = dataFormatter()
+        
         
     def createWidgets(self):
         self.createTabs()
@@ -25,7 +26,7 @@ class gitApp:
 
 
     def createTabs(self):
-        self.tabview = ctk.CTkTabview(master=self.app, width=900, height=900)
+        self.tabview = ctk.CTkTabview(master=self, width=1200, height=800)
         self.tabview.pack()
         self.user_tab = self.tabview.add("tab 1")
         self.search_tab = self.tabview.add("tab 2")
@@ -142,7 +143,7 @@ class gitApp:
 
 
 app = gitApp()
-app.app.mainloop()
+app.mainloop()
 
 
 
