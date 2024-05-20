@@ -17,7 +17,12 @@ class dataFormatter:
         for commit in data:
             commit_message = commit['commit']['message']
             commit_date = commit['commit']['committer']['date']
-            commit_details+= f"{commit_message} {commit_date}\n"
+            commit_details+= (
+                 "================================================================================\n"
+                f"Commit: {commit_message}\n"
+                f"Date:   {commit_date}\n"
+                "--------------------------------------------------------------------------------\n"
+            )
         return commit_details
 
 

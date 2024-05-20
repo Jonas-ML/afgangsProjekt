@@ -44,14 +44,14 @@ class gitApp:
         
     def createTxtWidget(self):
         self.my_text= ctk.CTkTextbox(self.search_tab,
-        width=600,
-        height=400,
+        width=800,
+        height=600,
         corner_radius=1,)
 
-        self.my_text.pack(pady =10)
+        self.my_text.pack(pady=10)
 
         self.txt_frame = ctk.CTkFrame(self.search_tab)
-        self.txt_frame.pack(pady=130)
+        self.txt_frame.pack(pady=10)
         
         self.delete_button = ctk.CTkButton(self.txt_frame, text="Delete", command=self.delete)
         self.save_button = ctk.CTkButton(self.txt_frame, text="Save", command=self.save)

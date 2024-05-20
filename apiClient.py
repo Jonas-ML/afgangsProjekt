@@ -23,8 +23,18 @@ class restClient: # init of object with baseURL and token
             print("Error making GET request" + ":", error)
             return None, None
 
-    def post(self, path, params=None, headers=None):
-        pass
+    def post(self, path, params=None, headers=None, body=None):
+        url = self.base_url + "/" + path
+        final_headers = self.default_header
+        if headers:
+            final_headers.update(headers)
+        try:
+            response = requests.post(url, headers=final_headers, params=params, data=body)
+            status_code = response.status_code
+            return response, status_code
+        except requests.RequestException as error:
+            print("Error making GET request" + ":", error)
+            return None, None
 
 
   ## we have init for authentication and holding the base url as variable
