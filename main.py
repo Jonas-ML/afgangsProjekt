@@ -9,7 +9,7 @@ from formatMethods import *
 
 class gitApp(ctk.CTk):
     def __init__(self):
-        super().__init__()
+        super().__init__() # makes sure that CTK is intialised before other inits
         self.a = restClient()
         self.geometry("1200x800")
         self.createWidgets()
@@ -17,7 +17,7 @@ class gitApp(ctk.CTk):
         self.dataFormatter = dataFormatter()
         
         
-    def createWidgets(self):
+    def createWidgets(self): # Handles the creation of widgets
         self.createTabs()
         self.createLabels()
         self.createEntryBoxes()
@@ -30,7 +30,7 @@ class gitApp(ctk.CTk):
         self.tabview.pack()
         self.user_tab = self.tabview.add("tab 1")
         self.search_tab = self.tabview.add("tab 2")
-        self.tabview._segmented_button.grid(sticky="NSEW") #Sørger for tabs er i en relativ præsentabel postion
+        self.tabview._segmented_button.grid(sticky="NSEW") # Placement of tabs
 
     def createLabels(self):
         pass
@@ -63,71 +63,96 @@ class gitApp(ctk.CTk):
 
     def repoChoice(self):
         name = self.user_entry.get()
-        response, status_code = self.a.get(f"users/{name}/repos")
-        if status_code == 200:
-            repoRes = dataFormatter.formatResponse(response)
-            repo_options = dataFormatter.fetchRepos(repoRes)
-            if repo_options:
-                if name not in self.dropdowns:
-                    self.dropdowns[name] = {}
-                if 'repo_combo' not in self.dropdowns[name]:
-                    repo_combo = ctk.CTkComboBox(self.user_tab, values=repo_options, command=lambda event=None: self.branchChoice(name, repo_combo.get()))
-                    repo_combo.pack(pady=1)
-                    self.dropdowns[name]['repo_combo'] = repo_combo
+        try:
+            response, status_code = self.a.get(f"users/{name}/repos")
+            if status_code == 200:
+                repoRes = dataFormatter.formatResponse(response)
+                repo_options = dataFormatter.fetchRepos(repoRes)
+                if repo_options:
+                    if name not in self.dropdowns: # Makes sure that dropdown element sare only created once pr username
+                        self.dropdowns[name] = {}
+                    if 'repo_combo' not in self.dropdowns[name]:
+                        repo_combo = ctk.CTkComboBox(self.user_tab, values=repo_options, command=lambda event=None: self.branchChoice(name, repo_combo.get()))
+                        repo_combo.pack(pady=1)
+                        self.dropdowns[name]['repo_combo'] = repo_combo # Creates repo_combo key in dictionary
+                else:
+                    print("No repos found for this user. Did you supply the correct username?")
             else:
-                print("No repos found for this user. Did you supply the correct username?")
-        else:
-            print(f"Error fetching data: {status_code}")
+                print(f"Error fetching data: {status_code}")
     
+        except Exception as e:
+            print(f"An error occurred while fetching repositories: {e}")
+            
+            
 
     def branchChoice(self, name, choosen_repo):
-        response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/branches")
-        if status_code == 200:
-            branchRes = dataFormatter.formatResponse(response)
-            branch_options = dataFormatter.fetchRepos(branchRes)
-            if branch_options:
-                if 'branch_combo' not in self.dropdowns[name]:
-                    self.branch_combo = ctk.CTkComboBox(self.user_tab, values=branch_options, command=lambda event=None: self.getCommits(name, choosen_repo, self.branch_combo.get()))
-                    self.branch_combo.pack(pady=5)
-                    self.dropdowns[name]['branch_combo'] = self.branch_combo
+        try:
+            response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/branches")
+            if status_code == 200:
+                branchRes = dataFormatter.formatResponse(response)
+                branch_options = dataFormatter.fetchRepos(branchRes)
+                if branch_options:
+                    if 'branch_combo' not in self.dropdowns[name]:
+                        self.branch_combo = ctk.CTkComboBox(self.user_tab, values=branch_options, command=lambda event=None: self.getCommits(name, choosen_repo, self.branch_combo.get()))
+                        self.branch_combo.pack(pady=5)
+                        self.dropdowns[name]['branch_combo'] = self.branch_combo
+                else:
+                    print("Couldnt fetch branches for this repository")
             else:
-                print("Couldnt fetch branches for this repo")
-        else:
-            print(f"Error fetching data {status_code}")
+                print(f"Error fetching response data {status_code}")
+        except Exception as e:
+            print(f"An error occurred while fetching branches for the given repository: {e}")
+            
+            
     
     def getCommits(self, name, choosen_repo, choosen_Branch):
-        response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/commits", params={"sha" : choosen_Branch})
-        if status_code == 200:
-            commits_raw = dataFormatter.formatResponse(response)
-            commits_pretty = dataFormatter.formatCommits(commits_raw, choosen_repo, choosen_Branch)
-            self.my_text.insert(END, commits_pretty)
-            self.clearDropdowns(name)
-            self.tabview.set("tab 2")
-        
-        else:
-            print(f"Error fetching data {status_code}")
+        try:
+            response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/commits", params={"sha" : choosen_Branch})
+            if status_code == 200:
+                commits_raw = dataFormatter.formatResponse(response)
+                commits_pretty = dataFormatter.formatCommits(commits_raw, choosen_repo, choosen_Branch)
+                self.my_text.insert(END, commits_pretty)
+                self.clearDropdowns(name)
+                self.tabview.set("tab 2")
+            
+            else:
+                print(f"Error fetching response data: {status_code}")
+        except Exception as e:
+            print(f"An error occurred while fetching commmits: {e}")
 
 
     def delete(self):
-        self.my_text.delete(0.0, "end")
+        try:
+            self.my_text.delete(0.0, "end")
+        except Exception as e:
+            print(f"An error occurred while deleting text: {e}")
 
     def save(self):
-        dialog = ctk.CTkInputDialog(text="What would you like your file to be named", title="Save file")
-        fileName = dialog.get_input()
-        txt = self.my_text.get(0.0, END)
-        if fileName:
-            txtFile = open(f"{fileName}.txt", "w")
-            txtFile.write(f"{txt}")
-            txtFile.close()
+        try:
+            dialog = ctk.CTkInputDialog(text="What would you like your file to be named", title="Save file")
+            fileName = dialog.get_input()
+            txt = self.my_text.get(0.0, END)
+            if fileName:
+                try:
+                    with open(f"{fileName}.txt", "w") as txtFile: # Changed to "with open" statement to improve exception handling
+                        txtFile.write(f"{txt}")
+                except IOError as e:
+                    print(f"An error occurred while saving the file: {e}")
+        except Exception as e:
+            print("")
+            
             
             
     def clearDropdowns(self, name):
-        if name in self.dropdowns and 'repo_combo' in self.dropdowns[name]:
-            self.dropdowns[name]['repo_combo'].destroy()
-            del self.dropdowns[name]['repo_combo']
-        if name in self.dropdowns and 'branch_combo' in self.dropdowns[name]:
-            self.dropdowns[name]['branch_combo'].destroy()
-            del self.dropdowns[name]['branch_combo']
+        try:
+            if name in self.dropdowns and 'repo_combo' in self.dropdowns[name]:
+                self.dropdowns[name]['repo_combo'].destroy()
+                del self.dropdowns[name]['repo_combo']
+            if name in self.dropdowns and 'branch_combo' in self.dropdowns[name]:
+                self.dropdowns[name]['branch_combo'].destroy()
+                del self.dropdowns[name]['branch_combo']
+        except Exception as e:
+            print(f"An error occurred while clearing dropdowns: {e}")
     
 
 
