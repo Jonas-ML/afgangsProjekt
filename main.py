@@ -15,6 +15,9 @@ class gitApp(ctk.CTk):
         self.createWidgets()
         self.dropdowns = {}
         self.dataFormatter = dataFormatter()
+        self.choosen_repo = None
+        self.choosen_branch = None
+
         
         
     def createWidgets(self): # Handles the creation of widgets
@@ -56,8 +59,11 @@ class gitApp(ctk.CTk):
         
         self.delete_button = ctk.CTkButton(self.txt_frame, text="Delete", command=self.delete)
         self.save_button = ctk.CTkButton(self.txt_frame, text="Save", command=self.save)
-        self.delete_button.grid(row=2, column=0, padx=2)
+        self.delete_button.grid(row=2, column=0)
         self.save_button.grid(row=2, column=2)
+        
+        self.format_button = ctk.CTkButton(self.txt_frame, text="Format", command=self.formatTXT) #####
+        self.format_button.grid(row=2, column=3)
         
 
 
@@ -66,8 +72,8 @@ class gitApp(ctk.CTk):
         try:
             response, status_code = self.a.get(f"users/{name}/repos")
             if status_code == 200:
-                repoRes = dataFormatter.formatResponse(response)
-                repo_options = dataFormatter.fetchRepos(repoRes)
+                repoRes = dataFormatter().formatResponse(response)
+                repo_options = dataFormatter().fetchRepos(repoRes)
                 if repo_options:
                     if name not in self.dropdowns: # Makes sure that dropdown element sare only created once pr username
                         self.dropdowns[name] = {}
@@ -89,8 +95,8 @@ class gitApp(ctk.CTk):
         try:
             response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/branches")
             if status_code == 200:
-                branchRes = dataFormatter.formatResponse(response)
-                branch_options = dataFormatter.fetchRepos(branchRes)
+                branchRes = dataFormatter().formatResponse(response)
+                branch_options = dataFormatter().fetchRepos(branchRes)
                 if branch_options:
                     if 'branch_combo' not in self.dropdowns[name]:
                         self.branch_combo = ctk.CTkComboBox(self.user_tab, values=branch_options, command=lambda event=None: self.getCommits(name, choosen_repo, self.branch_combo.get()))
@@ -107,10 +113,12 @@ class gitApp(ctk.CTk):
     
     def getCommits(self, name, choosen_repo, choosen_Branch):
         try:
+            self.choosen_repo = choosen_repo
+            self.choosen_branch = choosen_Branch
             response, status_code = self.a.get(f"repos/{name}/{choosen_repo}/commits", params={"sha" : choosen_Branch})
             if status_code == 200:
-                commits_raw = dataFormatter.formatResponse(response)
-                commits_pretty = dataFormatter.formatCommits(commits_raw, choosen_repo, choosen_Branch)
+                commits_raw = dataFormatter().formatResponse(response)
+                commits_pretty = dataFormatter().formatCommits(commits_raw, choosen_repo, choosen_Branch)
                 self.my_text.insert(END, commits_pretty)
                 self.clearDropdowns(name)
                 self.tabview.set("tab 2")
@@ -139,7 +147,7 @@ class gitApp(ctk.CTk):
                 except IOError as e:
                     print(f"An error occurred while saving the file: {e}")
         except Exception as e:
-            print("")
+            print(f"An error occurred while getting the filename: {e}")
             
             
             
@@ -154,17 +162,22 @@ class gitApp(ctk.CTk):
         except Exception as e:
             print(f"An error occurred while clearing dropdowns: {e}")
     
+    def formatTXT(self):
+        try:
+            dialog = ctk.CTkInputDialog(text="Enter keywords separated by commas", title="Keyword Input")
+            keywords = dialog.get_input().split(',')
+            txt = self.my_text.get(0.0, END)
+            formatted_commits = dataFormatter().textFormatting(txt, keywords)
+            self.my_text.delete(0.0, END)
+            self.my_text.insert(END, formatted_commits)
+        except Exception as e:
+            print(f"An error occurred while formatting commits: {e}")
 
 
 
 
 
-
-
-
-
-
-
+    
 
 
 app = gitApp()

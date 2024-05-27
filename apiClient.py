@@ -21,7 +21,7 @@ class restClient: # init of object with baseURL and token
             return response, status_code
         except requests.RequestException as error:
             print("Error making GET request" + ":", error)
-            return None, None
+            return None, None # returns None on hitting an exception
 
     def post(self, path, params=None, headers=None, body=None):
         url = self.base_url + "/" + path
