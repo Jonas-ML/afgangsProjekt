@@ -12,6 +12,7 @@ class gitApp(ctk.CTk):
         super().__init__() # makes sure that CTK is intialised before other inits
         self.a = restClient()
         self.geometry("1200x800")
+        self.title("Commit extractor")
         self.createWidgets()
         self.dropdowns = {}
         self.dataFormatter = dataFormatter()
@@ -31,8 +32,8 @@ class gitApp(ctk.CTk):
     def createTabs(self):
         self.tabview = ctk.CTkTabview(master=self, width=1200, height=800)
         self.tabview.pack()
-        self.user_tab = self.tabview.add("tab 1")
-        self.search_tab = self.tabview.add("tab 2")
+        self.user_tab = self.tabview.add("Selection")
+        self.search_tab = self.tabview.add("Formatting")
         self.tabview._segmented_button.grid(sticky="NSEW") # Placement of tabs
 
     def createLabels(self):
@@ -58,12 +59,16 @@ class gitApp(ctk.CTk):
         self.txt_frame.pack(pady=10)
         
         self.delete_button = ctk.CTkButton(self.txt_frame, text="Delete", command=self.delete)
-        self.save_button = ctk.CTkButton(self.txt_frame, text="Save", command=self.save)
-        self.delete_button.grid(row=2, column=0)
-        self.save_button.grid(row=2, column=2)
+        self.delete_button.grid(padx=2, row=2, column=6)
+        
+        self.save_button = ctk.CTkButton(self.txt_frame, text="Save To TXT", command=self.save)
+        self.save_button.grid(padx=2, row=2, column=4)
+        
+        self.import_button = ctk.CTkButton(self.txt_frame, text="Import Commits", command=self.importTXT)
+        self.import_button.grid(padx=2, row=2, column=0)
         
         self.format_button = ctk.CTkButton(self.txt_frame, text="Format", command=self.formatTXT) #####
-        self.format_button.grid(row=2, column=3)
+        self.format_button.grid(padx=2, row=2, column=2)
         
 
 
@@ -122,11 +127,12 @@ class gitApp(ctk.CTk):
                 self.my_text.insert(END, commits_pretty)
                 self.clearDropdowns(name)
                 self.tabview.set("tab 2")
-            
+                self.commits_pretty = commits_pretty
             else:
                 print(f"Error fetching response data: {status_code}")
         except Exception as e:
             print(f"An error occurred while fetching commmits: {e}")
+        
 
 
     def delete(self):
@@ -148,9 +154,25 @@ class gitApp(ctk.CTk):
                     print(f"An error occurred while saving the file: {e}")
         except Exception as e:
             print(f"An error occurred while getting the filename: {e}")
+     
+    def importTXT(self):
+        try:
+            self.my_text.insert(END, self.commits_pretty)
+        except Exception as e:
+            print(f"No commit data currently stored: {e}")
             
-            
-            
+        
+    def formatTXT(self):
+        try:
+            dialog = ctk.CTkInputDialog(text="Enter keywords separated by commas", title="Keyword Input")
+            keywords = dialog.get_input().split(',')
+            txt = self.my_text.get(0.0, END)
+            formatted_commits = dataFormatter().textFormatting(txt, keywords)
+            self.my_text.delete(0.0, END)
+            self.my_text.insert(END, formatted_commits)
+        except Exception as e:
+            print(f"An error occurred while formatting commits: {e}")       
+              
     def clearDropdowns(self, name):
         try:
             if name in self.dropdowns and 'repo_combo' in self.dropdowns[name]:
@@ -162,17 +184,6 @@ class gitApp(ctk.CTk):
         except Exception as e:
             print(f"An error occurred while clearing dropdowns: {e}")
     
-    def formatTXT(self):
-        try:
-            dialog = ctk.CTkInputDialog(text="Enter keywords separated by commas", title="Keyword Input")
-            keywords = dialog.get_input().split(',')
-            txt = self.my_text.get(0.0, END)
-            formatted_commits = dataFormatter().textFormatting(txt, keywords)
-            self.my_text.delete(0.0, END)
-            self.my_text.insert(END, formatted_commits)
-        except Exception as e:
-            print(f"An error occurred while formatting commits: {e}")
-
 
 
 

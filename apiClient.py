@@ -39,7 +39,7 @@ class restClient: # init of object with baseURL and token
 
   ## we have init for authentication and holding the base url as variable
   # we will make functions to send requests
-  # these should takebody and header parameters from main.py
+  # these should take body and header parameters from main.py
   
   #Metoder:
   # Json.dumps() - serialzier et objekt, så hvis du f.eks har en dic {john : 1, mark : 2}, vil den omdanne til json struktur

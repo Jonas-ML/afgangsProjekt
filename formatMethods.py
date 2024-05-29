@@ -35,7 +35,11 @@ class dataFormatter:
             for keyword in keywords:
                 if keyword.strip() != "":
                     keyword_commits = [commit.strip() for commit in txt.split("================================================================================") if keyword.strip().lower() in commit.lower()]
-                    rearranged_commits += "\n".join(keyword_commits) + ";\n"  # Separating commits by semicolons
+                    for commit in keyword_commits:
+                        rearranged_commits += (
+                            "================================================================================\n"
+                            f"{commit}\n"
+                        )
             return rearranged_commits
         except Exception as e:
             print(f"An error occurred while formatting commits: {e}")
