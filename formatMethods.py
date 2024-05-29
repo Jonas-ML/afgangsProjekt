@@ -22,7 +22,7 @@ class dataFormatter:
             commit_message = commit['commit']['message']
             commit_date = commit['commit']['committer']['date']
             commit_details += (
-                 "================================================================================\n"
+                 "============================================================================\n"
                 f"Repository: {choosen_repo} on Branch: {choosen_Branch}\n"
                 f"Commit: {commit_message}\n"
                 f"Date:   {commit_date}\n"
@@ -34,10 +34,10 @@ class dataFormatter:
             rearranged_commits = ""
             for keyword in keywords:
                 if keyword.strip() != "":
-                    keyword_commits = [commit.strip() for commit in txt.split("================================================================================") if keyword.strip().lower() in commit.lower()]
+                    keyword_commits = [commit.strip() for commit in txt.split("============================================================================") if keyword.strip().lower() in commit.lower()]
                     for commit in keyword_commits:
                         rearranged_commits += (
-                            "================================================================================\n"
+                            "============================================================================\n"
                             f"{commit}\n"
                         )
             return rearranged_commits
