@@ -62,8 +62,8 @@ class gitApp(ctk.CTk):
         self.delete_button = ctk.CTkButton(self.txt_frame, text="Delete", command=self.delete)
         self.delete_button.grid(padx=2, row=2, column=4)
         
-        self.save_button = ctk.CTkButton(self.txt_frame, text="Save To TXT", command=self.save)
-        self.save_button.grid(padx=2, row=2, column=6)
+        #self.save_button = ctk.CTkButton(self.txt_frame, text="Save To TXT", command=self.save)
+        #self.save_button.grid(padx=2, row=2, column=6)
         
         self.import_button = ctk.CTkButton(self.txt_frame, text="Import Commits", command=self.importTXT)
         self.import_button.grid(padx=2, row=2, column=0)
@@ -71,8 +71,11 @@ class gitApp(ctk.CTk):
         self.format_button = ctk.CTkButton(self.txt_frame, text="Format", command=self.formatTXT) #####
         self.format_button.grid(padx=2, row=2, column=2)
         
-        self.convert_button = ctk.CTkButton(self.txt_frame, text="Save to PDF", command=self.convert_to_pdf)
-        self.convert_button.grid(padx=2, row=2, column=8) 
+        #self.convert_button = ctk.CTkButton(self.txt_frame, text="Save to PDF", command=self.convert_to_pdf)
+        #self.convert_button.grid(padx=2, row=2, column=8) 
+        
+        self.save_option = ctk.CTkComboBox(self.txt_frame, values=["Save as","TXT", "PDF"], command=self.save)
+        self.save_option.grid(padx=2, row=2, column=6)
 
     def repoChoice(self):
         name = self.user_entry.get()
@@ -147,19 +150,40 @@ class gitApp(ctk.CTk):
         except Exception as e:
             print(f"An error occurred while deleting text: {e}")
 
-    def save(self):
+     
+    def save(self, choice):
         try:
-            dialog = ctk.CTkInputDialog(text="What would you like your file to be named", title="Save file")
-            fileName = dialog.get_input()
-            txt = self.my_text.get(0.0, END)
-            if fileName:
-                try:
-                    with open(f"{fileName}.txt", "w") as txtFile: # Changed to "with open" statement to improve exception handling
-                        txtFile.write(f"{txt}")
-                except IOError as e:
-                    print(f"An error occurred while saving the file: {e}")
+            choice = self.save_option.get()
+            text = self.my_text.get(0.0, END)
+            
+            if choice == "PDF":
+                self.save_as_pdf(text)
+            elif choice == "TXT":
+                self.save_as_txt(text)
+            else:
+                print("Invalid choice")
         except Exception as e:
-            print(f"An error occurred while getting the filename: {e}")
+            print(f"An error occurred while saving: {e}")
+
+    def save_as_pdf(self, text):
+        try:
+            pdfDialog = ctk.CTkInputDialog(text="Enter title of document", title="PDF creation")
+            docName = pdfDialog.get_input()
+            pdf = TextToPDF(title=docName)
+            pdf.createPDF(text, f"{docName}.pdf")
+        except Exception as e:
+            print(f"Error creating PDF: {e}")
+
+    def save_as_txt(self, text):
+        try:
+            dialog = ctk.CTkInputDialog(text="Enter title of file", title="Save file")
+            fileName = dialog.get_input()
+            with open(f"{fileName}.txt", "w") as txtFile:
+                txtFile.write(text)
+        except IOError as e:
+            print(f"An error occurred while saving the file: {e}")
+        except Exception as e:
+            print(f"Error getting filename or text content: {e}")
      
     def importTXT(self):
         try:
@@ -191,12 +215,7 @@ class gitApp(ctk.CTk):
             print(f"An error occurred while clearing dropdowns: {e}")
     
 
-    def convert_to_pdf(self):
-        text = self.my_text.get(0.0, END)
-        dialog = ctk.CTkInputDialog(text="Enter title of document", title="PDF creation")
-        docName = dialog.get_input()
-        pdf = TextToPDF(title=docName)
-        pdf.createPDF(text, f"{docName}.pdf")
+
 
 
     
