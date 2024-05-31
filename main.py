@@ -1,4 +1,5 @@
 
+import time
 from apiClient import *
 from customtkinter import *
 import customtkinter as ctk
@@ -19,12 +20,11 @@ class gitApp(ctk.CTk):
         self.dataFormatter = dataFormatter()
         self.choosen_repo = None
         self.choosen_branch = None
-
+    
         
         
     def createWidgets(self): # Handles the creation of widgets
         self.createTabs()
-        self.createLabels()
         self.createEntryBoxes()
         self.createButtons()
         self.createTxtWidget()
@@ -36,9 +36,6 @@ class gitApp(ctk.CTk):
         self.user_tab = self.tabview.add("Selection")
         self.search_tab = self.tabview.add("Formatting")
         self.tabview._segmented_button.grid(sticky="NSEW") # Placement of tabs
-
-    def createLabels(self):
-        pass
     
     def createEntryBoxes(self):
         self.user_entry = ctk.CTkEntry(self.user_tab, placeholder_text="Github username:")
@@ -52,7 +49,7 @@ class gitApp(ctk.CTk):
         self.my_text= ctk.CTkTextbox(self.search_tab,
         width=800,
         height=600,
-        corner_radius=1,)
+        corner_radius=1)
 
         self.my_text.pack(pady=10)
 
@@ -62,17 +59,12 @@ class gitApp(ctk.CTk):
         self.delete_button = ctk.CTkButton(self.txt_frame, text="Delete", command=self.delete)
         self.delete_button.grid(padx=2, row=2, column=4)
         
-        #self.save_button = ctk.CTkButton(self.txt_frame, text="Save To TXT", command=self.save)
-        #self.save_button.grid(padx=2, row=2, column=6)
         
         self.import_button = ctk.CTkButton(self.txt_frame, text="Import Commits", command=self.importTXT)
         self.import_button.grid(padx=2, row=2, column=0)
         
         self.format_button = ctk.CTkButton(self.txt_frame, text="Format", command=self.formatTXT) #####
         self.format_button.grid(padx=2, row=2, column=2)
-        
-        #self.convert_button = ctk.CTkButton(self.txt_frame, text="Save to PDF", command=self.convert_to_pdf)
-        #self.convert_button.grid(padx=2, row=2, column=8) 
         
         self.save_option = ctk.CTkComboBox(self.txt_frame, values=["Save as","TXT", "PDF"], command=self.save)
         self.save_option.grid(padx=2, row=2, column=6)
@@ -94,12 +86,12 @@ class gitApp(ctk.CTk):
                         repo_combo.pack(pady=1)
                         self.dropdowns[name]['repo_combo'] = repo_combo # Creates repo_combo key in dictionary
                 else:
-                    print("No repos found for this user. Did you supply the correct username?")
+                    self.popup(f"No repos found for this user.\n Did you supply the correct username?")
             else:
-                print(f"Error fetching data: {status_code}")
+                self.popup(f"Error fetching data:\n {status_code}")
     
         except Exception as e:
-            print(f"An error occurred while fetching repositories: {e}")
+            self.popup(f"An error occurred while fetching repositories:\n {e}")
             
             
 
@@ -117,11 +109,11 @@ class gitApp(ctk.CTk):
                         self.branch_combo.pack(pady=5)
                         self.dropdowns[name]['branch_combo'] = self.branch_combo
                 else:
-                    print("Couldnt fetch branches for this repository")
+                    self.popup(f"Couldnt fetch branches for:\n {choosen_repo}")
             else:
-                print(f"Error fetching response data {status_code}")
+                self.popup(f"Error fetching response data {status_code}")
         except Exception as e:
-            print(f"An error occurred while fetching branches for the given repository: {e}")
+            self.popup(f"An error occurred while fetching branches for: \n {choosen_repo}, \n Error: {e}")
             
             
     
@@ -138,17 +130,34 @@ class gitApp(ctk.CTk):
                 self.tabview.set("Formatting")
                 self.commits_pretty = commits_pretty
             else:
-                print(f"Error fetching response data: {status_code}")
+                self.popup(f"Error fetching response data:\n {status_code}")
         except Exception as e:
-            print(f"An error occurred while fetching commmits: {e}")
-        
+            self.popup(f"An error occurred while fetching commmits:\n {e}")
+    
+    def popup(self, text):
+        try:
+            self.popupWindow = ctk.CTkToplevel()
+            self.popupWindow.title("Message")
+            self.popupWindow.geometry("300x150")
+            self.popupWindow.resizable(False, False)
+            self.message = ctk.CTkLabel(self.popupWindow, width=10, height=10, text=f"{text}")
+            self.message.pack(pady=1)
+            
+            self.popupButton = ctk.CTkButton(self.popupWindow, text="Close", command=self.closePopup)
+            self.popupButton.pack(pady=30)
+        except Exception as e:
+            print(f"Error making popup window: {e} ")
 
+
+    def closePopup(self):
+        self.popupWindow.destroy()
+        self.popupWindow.update()
 
     def delete(self):
         try:
             self.my_text.delete(0.0, "end")
         except Exception as e:
-            print(f"An error occurred while deleting text: {e}")
+            self.popup(f"An error occurred while deleting text:\n {e}")
 
      
     def save(self, choice):
@@ -161,18 +170,19 @@ class gitApp(ctk.CTk):
             elif choice == "TXT":
                 self.save_as_txt(text)
             else:
-                print("Invalid choice")
+                self.popup("Invalid choice")
         except Exception as e:
-            print(f"An error occurred while saving: {e}")
+            self.popup(f"An error occurred while saving:\n {e}")
 
     def save_as_pdf(self, text):
         try:
             pdfDialog = ctk.CTkInputDialog(text="Enter title of document", title="PDF creation")
             docName = pdfDialog.get_input()
-            pdf = TextToPDF(title=docName)
+            pdf = TextToPDF(ttle=docName)
             pdf.createPDF(text, f"{docName}.pdf")
+            self.popup(f"PDF created successfully,\n in project root")
         except Exception as e:
-            print(f"Error creating PDF: {e}")
+            self.popup(f"Error creating PDF:\n {e}")
 
     def save_as_txt(self, text):
         try:
@@ -181,15 +191,15 @@ class gitApp(ctk.CTk):
             with open(f"{fileName}.txt", "w") as txtFile:
                 txtFile.write(text)
         except IOError as e:
-            print(f"An error occurred while saving the file: {e}")
+            self.popup(f"An error occurred while saving the file:\n {e}")
         except Exception as e:
-            print(f"Error getting filename or text content: {e}")
+            self.popup(f"Error getting filename or text content:\n {e}")
      
     def importTXT(self):
         try:
             self.my_text.insert(END, self.commits_pretty)
         except Exception as e:
-            print(f"No commit data currently stored: {e}")
+            self.popup(f"No commit data currently stored:\n {e}")
             
         
     def formatTXT(self):
@@ -201,7 +211,7 @@ class gitApp(ctk.CTk):
             self.my_text.delete(0.0, END)
             self.my_text.insert(END, formatted_commits)
         except Exception as e:
-            print(f"An error occurred while formatting commits: {e}")       
+            self.popup(f"An error occurred while formatting commits:\n {e}")       
               
     def clearDropdowns(self, name):
         try:
@@ -212,12 +222,7 @@ class gitApp(ctk.CTk):
                 self.dropdowns[name]['branch_combo'].destroy()
                 del self.dropdowns[name]['branch_combo']
         except Exception as e:
-            print(f"An error occurred while clearing dropdowns: {e}")
-    
-
-
-
-
+            self.popup(f"An error occurred while clearing dropdowns:\n {e}")
     
 
 
