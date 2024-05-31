@@ -3,7 +3,7 @@ import time
 from apiClient import *
 from customtkinter import *
 import customtkinter as ctk
-from formatMethods import *
+from JSON_Formatter import *
 from PDFconverter import TextToPDF
 
 
