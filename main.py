@@ -114,8 +114,7 @@ class gitApp(ctk.CTk):
                 self.popup(f"Error fetching response data {status_code}")
         except Exception as e:
             self.popup(f"An error occurred while fetching branches for: \n {choosen_repo}, \n Error: {e}")
-            
-            
+                        
     
     def getCommits(self, name, choosen_repo, choosen_Branch):
         try:
@@ -178,7 +177,7 @@ class gitApp(ctk.CTk):
         try:
             pdfDialog = ctk.CTkInputDialog(text="Enter title of document", title="PDF creation")
             docName = pdfDialog.get_input()
-            pdf = TextToPDF(ttle=docName)
+            pdf = TextToPDF(title=docName)
             pdf.createPDF(text, f"{docName}.pdf")
             self.popup(f"PDF created successfully,\n in project root")
         except Exception as e:
@@ -188,10 +187,11 @@ class gitApp(ctk.CTk):
         try:
             dialog = ctk.CTkInputDialog(text="Enter title of file", title="Save file")
             fileName = dialog.get_input()
-            with open(f"{fileName}.txt", "w") as txtFile:
-                txtFile.write(text)
-        except IOError as e:
-            self.popup(f"An error occurred while saving the file:\n {e}")
+            try:
+                with open(f"{fileName}.txt", "w") as txtFile:
+                    txtFile.write(text)
+            except IOError as e:
+                self.popup(f"An error occurred while saving the file:\n {e}")
         except Exception as e:
             self.popup(f"Error getting filename or text content:\n {e}")
      

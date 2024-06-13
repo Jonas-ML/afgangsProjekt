@@ -10,8 +10,6 @@ class dataFormatter:
             data = json.loads(response)
             repo_options = [repo['name'] for repo in data]
             return repo_options 
-        except json.JSONDecodeError as e: # Syntax errors, missing contents, unsupported data types
-            print(f"An error occurred while decoding JSON: {e}")
         except Exception as e:
             print(f"An error occurred while fetching repos: {e}")
 
@@ -39,10 +37,6 @@ class dataFormatter:
                     f"Date:   {commit_date}\n"
                 )
             return commit_details
-        except json.JSONDecodeError as e: # Syntax errors, missing contents, unsupported data types
-            print(f"An error occurred while decoding JSON: {e}")
-        except KeyError as e: # If you try to find a key that doesnt exist
-            print(f"Missing key in JSON data: {e}")
         except Exception as e:
             print(f"An error occurred while formatting commits: {e}")
 
